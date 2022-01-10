@@ -1,3 +1,4 @@
+using ABU.GitHubApiClient;
 using ABU.Portfolio;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,13 @@ services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
+
+// User add
+services.AddGitHubApiClient(options =>
+{
+    options.AddToken(Environment.GetEnvironmentVariable("DOTNET_GITHUB_TOKEN")!);
+    options.AddUsername(Environment.GetEnvironmentVariable("DOTNET_GITHUB_USER")!);
+});
 
 var app = builder.Build();
 
