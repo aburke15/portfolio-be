@@ -1,5 +1,6 @@
 using ABU.GitHubApiClient;
 using ABU.Portfolio;
+using ABU.Portfolio.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -19,6 +20,8 @@ services.AddGitHubApiClient(options =>
     options.AddToken(Environment.GetEnvironmentVariable("DOTNET_GITHUB_TOKEN")!);
     options.AddUsername(Environment.GetEnvironmentVariable("DOTNET_GITHUB_USER")!);
 });
+
+services.AddHostedService<GitHubBackgroundService>();
 
 var app = builder.Build();
 
