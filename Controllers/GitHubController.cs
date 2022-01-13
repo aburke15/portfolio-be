@@ -8,16 +8,21 @@ namespace ABU.Portfolio.Controllers;
 public class GitHubController : ControllerBase
 {
     private readonly IGitHubApiClient _client;
-    
-    public GitHubController(IGitHubApiClient client)
+    private readonly ILogger<GitHubController> _logger;
+
+    public GitHubController(IGitHubApiClient client, ILogger<GitHubController> logger)
     {
         _client = client;
+        _logger = logger;
     }
 
     [HttpGet("repos")]
     public async Task<IActionResult> GetReposAsync()
     {
         var result = await _client.GetRepositoriesForUserAsync();
+        
+        // map to object
+        
         return Ok(result.Json);
     }
 }
