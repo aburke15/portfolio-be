@@ -26,10 +26,12 @@ public class GitHubBackgroundService : BackgroundService
 
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine(e);
-                throw;
+                var methodInfo = System.Reflection.MethodBase.GetCurrentMethod();
+                var fullName = $"{methodInfo?.DeclaringType?.FullName} - {methodInfo?.Name}";
+                
+                _logger.Log(LogLevel.Error, $"An unexpected error occurred at: {DateTime.Now}, in => {fullName}. Message: {ex.Message}", ex);
             }
 
             await Task.Delay(TimeSpan.FromDays(2), stoppingToken);
