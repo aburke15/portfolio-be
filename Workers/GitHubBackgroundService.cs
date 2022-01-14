@@ -1,5 +1,7 @@
 using ABU.GitHubApiClient.Abstractions;
+using ABU.Portfolio.Models;
 using Ardalis.GuardClauses;
+using Newtonsoft.Json;
 
 namespace ABU.Portfolio.Workers;
 
@@ -13,28 +15,36 @@ public class GitHubBackgroundService : BackgroundService
         _provider = Guard.Against.Null(provider, nameof(provider));
         _logger = Guard.Against.Null(logger, nameof(logger));
     }
-    
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        const string workerName = nameof(GitHubBackgroundService);
+        var methodInfo = System.Reflection.MethodBase.GetCurrentMethod();
+        var fullName = $"{methodInfo?.DeclaringType?.FullName} - {methodInfo?.Name}";
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                _logger.Log(LogLevel.Information, message: $"{workerName} started at: {DateTime.Now}");
+                _logger.Log(LogLevel.Information, message: $"{fullName} started at: {DateTime.Now}");
+                
                 var scope = _provider.CreateScope();
-
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
+                var result = await client.GetRepositoriesForUserAsync(stoppingToken);
+
+                if (result.IsSuccessful)
+                {
+                    var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(result.Json!);
+                    // TODO: take repos and persist to azure storage
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine(e);
-                throw;
+                _logger.Log(LogLevel.Error, $"An unexpected error occurred at: {DateTime.Now}, in => {fullName}. Message: {ex.Message}", ex);
             }
 
-            await Task.Delay(TimeSpan.FromDays(2), stoppingToken);
+            await Task.Delay(TimeSpan.FromDays(10), stoppingToken);
         }
-        
-        _logger.Log(LogLevel.Information, $"{workerName} stopped at: {DateTime.Now}");
+
+        _logger.Log(LogLevel.Information, $"{fullName} stopped at: {DateTime.Now}");
     }
 }
