@@ -1,5 +1,7 @@
 using ABU.GitHubApiClient.Abstractions;
+using ABU.Portfolio.Models;
 using Ardalis.GuardClauses;
+using Newtonsoft.Json;
 
 namespace ABU.Portfolio.Workers;
 
@@ -24,11 +26,16 @@ public class GitHubBackgroundService : BackgroundService
             try
             {
                 _logger.Log(LogLevel.Information, message: $"{fullName} started at: {DateTime.Now}");
+                
                 var scope = _provider.CreateScope();
-
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
+                var result = await client.GetRepositoriesForUserAsync(stoppingToken);
 
-                var repoResult = await client.GetRepositoriesForUserAsync(stoppingToken);
+                if (result.IsSuccessful)
+                {
+                    var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(result.Json!);
+                    // TODO: take repos and persist to azure storage
+                }
             }
             catch (Exception ex)
             {

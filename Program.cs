@@ -21,6 +21,7 @@ services.AddGitHubApiClient(options =>
     options.AddUsername(Environment.GetEnvironmentVariable("DOTNET_GITHUB_USER")!);
 });
 
+
 services.AddHostedService<GitHubBackgroundService>();
 
 var app = builder.Build();

@@ -1,3 +1,3 @@
 namespace ABU.Portfolio.Models;
 
-public record GitHubRepositoryModel(string name, string description, string htmlUrl, DateTime createdAt, string language);
+public record GitHubRepositoryModel(string Name, string? Description, string HtmlUrl, DateTime CreatedAt, string? Language);
