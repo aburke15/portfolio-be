@@ -1,4 +1,5 @@
 using ABU.GitHubApiClient.Abstractions;
+using ABU.GitHubApiClient.Models;
 using ABU.Portfolio.Models;
 using Ardalis.GuardClauses;
 using Newtonsoft.Json;
@@ -29,11 +30,12 @@ public class GitHubBackgroundService : BackgroundService
                 
                 var scope = _provider.CreateScope();
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
-                var result = await client.GetRepositoriesForUserAsync(stoppingToken);
-
+                
+                var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
                 if (result.IsSuccessful)
                 {
                     var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(result.Json!);
+                    Console.WriteLine(repos);
                     // TODO: take repos and persist to azure storage
                 }
             }
@@ -42,7 +44,7 @@ public class GitHubBackgroundService : BackgroundService
                 _logger.Log(LogLevel.Error, $"An unexpected error occurred at: {DateTime.Now}, in => {fullName}. Message: {ex.Message}", ex);
             }
 
-            await Task.Delay(TimeSpan.FromDays(10), stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
         }
 
         _logger.Log(LogLevel.Information, $"{fullName} stopped at: {DateTime.Now}");
