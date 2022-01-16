@@ -4,6 +4,8 @@ namespace ABU.Portfolio.Models;
 
 public record GitHubRepositoryModel
 {
+    [JsonProperty("id")]
+    public long Id { get; set; }
     [JsonProperty("name")]
     public string? Name { get; init; }
     [JsonProperty("description")]

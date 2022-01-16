@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices.ComTypes;
 using ABU.Portfolio.Services.Abstractions;
+using Ardalis.GuardClauses;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace ABU.Portfolio.Services.Implementations;
@@ -11,7 +12,8 @@ public class TableStorageClient : ITableStorageClient
     
     public TableStorageClient()
     {
-        var storageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(AzureConnectionString));
+        var connectionString = Environment.GetEnvironmentVariable(AzureConnectionString);
+        var storageAccount = CloudStorageAccount.Parse(Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString)));
         _client = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
     }
     

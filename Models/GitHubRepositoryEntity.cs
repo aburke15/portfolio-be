@@ -4,7 +4,14 @@ namespace ABU.Portfolio.Models;
 
 public class GitHubRepositoryEntity : TableEntity
 {
-    public string Id { get; set; } = new Guid().ToString();
+    public GitHubRepositoryEntity()
+    {
+        var id = Guid.NewGuid().ToString();
+        Id = id;
+        RowKey = id;
+    }
+    
+    public string Id { get; }
     public long GitHubId { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
