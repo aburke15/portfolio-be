@@ -1,5 +1,7 @@
 using ABU.GitHubApiClient;
 using ABU.Portfolio;
+using ABU.Portfolio.Services.Abstractions;
+using ABU.Portfolio.Services.Implementations;
 using ABU.Portfolio.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,8 @@ services.AddGitHubApiClient(options =>
     options.AddUsername(Environment.GetEnvironmentVariable("DOTNET_GITHUB_USER")!);
 });
 
+services.AddScoped<ITableStorageClient, TableStorageClient>();
+services.AddTransient<ITableStorageService, TableStorageService>();
 
 services.AddHostedService<GitHubBackgroundService>();
 
