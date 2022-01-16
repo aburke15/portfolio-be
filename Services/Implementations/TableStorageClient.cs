@@ -15,13 +15,18 @@ public class TableStorageClient : ITableStorageClient
         _client = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
     }
     
-    public async Task<object> ExecuteTableOperationAsync(TableOperation operation, CancellationToken ct = default)
+    public async Task<object> ExecuteTableOperationAsync(string tableName, TableOperation operation, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var table = await GetCloudTableAsync(tableName, ct);
+        var tableResult = await table.ExecuteAsync(operation, ct);
+        return tableResult.Result;
     }
 
-    public async Task<CloudTable> GetCloudTableAsync(string table, CancellationToken ct = default)
+    private async Task<CloudTable> GetCloudTableAsync(string tableName, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var table = _client.GetTableReference(tableName);
+        _ = await table.CreateIfNotExistsAsync(ct);
+
+        return table;
     }
 }
