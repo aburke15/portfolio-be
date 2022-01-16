@@ -17,13 +17,13 @@ public class GitHubController : ControllerBase
     }
 
     [HttpGet("repos")]
-    public async Task<IActionResult> GetReposAsync()
+    public IActionResult GetReposAsync()
     {
         // var result = await _client.GetRepositoriesForUserAsync();
         
         // map to object
         
         // return Ok(result.Json);
-        return Ok();
+        return Ok("Hi, thanks for checking in.");
     }
 }

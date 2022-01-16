@@ -26,27 +26,33 @@ public class GitHubBackgroundService : BackgroundService
         {
             try
             {
-                _logger.Log(LogLevel.Information, message: $"{fullName} started at: {DateTime.Now}");
-                
+                _logger.Log(LogLevel.Information, message: "{FullName} started at: {DateTime}", fullName, DateTime.Now);
+
                 var scope = _provider.CreateScope();
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
-                
+
                 var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
                 if (result.IsSuccessful)
                 {
                     var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(result.Json!);
-                    Console.WriteLine(repos);
                     // TODO: take repos and persist to azure storage
                 }
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, $"An unexpected error occurred at: {DateTime.Now}, in => {fullName}. Message: {ex.Message}", ex);
+                _logger.Log(
+                    LogLevel.Error, 
+                    ex, 
+                    "An unexpected error occurred at: {DateTime}, in => {FullName}. Message: {Message}",
+                    DateTime.Now,
+                    fullName,
+                    ex.Message
+                );
             }
 
             await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
         }
 
-        _logger.Log(LogLevel.Information, $"{fullName} stopped at: {DateTime.Now}");
+        _logger.Log(LogLevel.Information, "{FullName} stopped at: {DateTime}", fullName, DateTime.Now);
     }
 }
