@@ -11,13 +11,9 @@
     <PackageReference Include="ABU.GitHubApiClient" Version="1.1.0" />
     <PackageReference Include="Ardalis.GuardClauses" Version="3.3.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="2.0.0-preview" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\Abstractions" />
-    <Folder Include="Services\Implementations" />
   </ItemGroup>
 
 </Project>
