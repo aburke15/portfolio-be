@@ -1,5 +1,6 @@
 using ABU.GitHubApiClient;
 using ABU.Portfolio;
+using ABU.Portfolio.Mapping;
 using ABU.Portfolio.Services.Abstractions;
 using ABU.Portfolio.Services.Implementations;
 using ABU.Portfolio.Workers;
@@ -23,6 +24,7 @@ services.AddGitHubApiClient(options =>
     options.AddUsername(Environment.GetEnvironmentVariable("DOTNET_GITHUB_USER")!);
 });
 
+services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(GitHubProfile)); });
 services.AddScoped<ITableStorageClient, TableStorageClient>();
 services.AddTransient<ITableStorageService, TableStorageService>();
 

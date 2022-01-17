@@ -1,3 +1,4 @@
+using ABU.Portfolio.Models;
 using ABU.Portfolio.Services.Abstractions;
 using Ardalis.GuardClauses;
 using Microsoft.Azure.Cosmos.Table;
@@ -25,9 +26,29 @@ public class TableStorageService : ITableStorageService
         return await _client.ExecuteTableOperationAsync(tableName, insertOrMerge, ct) as ITableEntity;
     }
 
+    public async Task<TableBatchResult> InsertManyAsync(string tableName, IEnumerable<ITableEntity> entities, CancellationToken ct = default)
+    {
+        var table = await _client.GetCloudTableAsync(tableName, ct);
+        TableBatchOperation batchOperation = new();
+
+        foreach (var tableEntity in entities)
+        {
+            batchOperation.InsertOrMerge(tableEntity);
+        }
+
+        return await table.ExecuteBatchAsync(batchOperation, ct);
+    }
+
     public async Task<ITableEntity?> RetrieveAsync(string tableName, string id, string partitionKey, CancellationToken ct = default)
     {
         var retrieve = TableOperation.Retrieve<ITableEntity>(id, partitionKey);
         return await _client.ExecuteTableOperationAsync(tableName, retrieve, ct) as ITableEntity;
+    }
+
+    public async Task<IEnumerable<ITableEntity>> RetrieveAllAsync(string tableName, CancellationToken ct = default)
+    {
+        var table = await _client.GetCloudTableAsync(tableName, ct);
+        return table.ExecuteQuery(new TableQuery<TableEntity>())
+            .ToList();
     }
 }
