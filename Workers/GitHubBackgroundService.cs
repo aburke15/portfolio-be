@@ -3,6 +3,8 @@ using ABU.GitHubApiClient.Models;
 using ABU.Portfolio.Models;
 using ABU.Portfolio.Services.Abstractions;
 using Ardalis.GuardClauses;
+using AutoMapper;
+using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 
 namespace ABU.Portfolio.Workers;
@@ -27,13 +29,20 @@ public class GitHubBackgroundService : BackgroundService
         {
             try
             {
-                _logger.Log(LogLevel.Information, message: "{FullName} started at: {DateTime}", fullName, DateTime.Now);
+                _logger.Log(
+                    LogLevel.Information, message:
+                    "{FullName} started at: {DateTime}",
+                    fullName,
+                    DateTime.Now
+                );
 
                 var scope = _provider.CreateScope();
-                var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
-                var storageService = scope.ServiceProvider.GetRequiredService<ITableStorageService>();
-                var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
                 
+                var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+                var storageService = scope.ServiceProvider.GetRequiredService<ITableStorageService>();
+                var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
+                var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
+
                 if (result.IsSuccessful)
                 {
                     var json = Guard.Against.NullOrWhiteSpace(result.Json, nameof(result.Json));
@@ -41,32 +50,42 @@ public class GitHubBackgroundService : BackgroundService
 
                     if (repos is null) continue;
 
-                    // TODO: take repos and persist to azure storage
-                    foreach (var repo in repos)
-                    {
-                        var entity = new GitHubRepositoryEntity
+                    var entities = repos.Select(repo =>
+                        mapper.Map<GitHubRepositoryModel, GitHubRepositoryEntity>(repo, opt =>
                         {
-                            GitHubId = repo.Id,
-                            Name = repo?.Name,
-                            Description = repo?.Description,
-                            CreatedAt = repo?.CreatedAt,
-                            HtmlUrl = repo?.HtmlUrl,
-                            Language = repo?.Language,
-                            PartitionKey = repo?.Language,
-                        };
+                            opt.AfterMap((src, dest) =>
+                            {
+                                dest.GitHubId = src.Id;
+                                dest.PartitionKey = "repository";
+                            });
+                        })
+                    );
 
-                        var tableResult = await storageService.InsertOrMergeAsync("repos", entity, stoppingToken);
-                        Console.WriteLine(tableResult);
-                    }
+                    var batchResult = await storageService.InsertManyAsync("repos", entities, stoppingToken);
+
+                    _logger.Log(
+                        LogLevel.Information,
+                        "{FullName} completed processing at: {DateTime}",
+                        fullName,
+                        DateTime.Now
+                    );
                 }
-                
-                _logger.Log(LogLevel.Information, "{FullName} completed processing at: {DateTime}", fullName, DateTime.Now);
+                else
+                {
+                    _logger.Log(
+                        LogLevel.Warning,
+                        "GitHub API client didn't respond with successful result at: {DateTime}, in => {FullName}. Message: {Message}",
+                        DateTime.Now,
+                        fullName,
+                        result.Message
+                    );
+                }
             }
             catch (Exception ex)
             {
                 _logger.Log(
-                    LogLevel.Error, 
-                    ex, 
+                    LogLevel.Error,
+                    ex,
                     "An unexpected error occurred at: {DateTime}, in => {FullName}. Message: {Message}",
                     DateTime.Now,
                     fullName,
@@ -74,9 +93,14 @@ public class GitHubBackgroundService : BackgroundService
                 );
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
         }
 
-        _logger.Log(LogLevel.Information, "{FullName} stopped at: {DateTime}", fullName, DateTime.Now);
+        _logger.Log(
+            LogLevel.Information,
+            "{FullName} stopped at: {DateTime}",
+            fullName,
+            DateTime.Now
+        );
     }
 }

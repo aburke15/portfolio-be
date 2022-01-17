@@ -24,7 +24,7 @@ public class TableStorageClient : ITableStorageClient
         return tableResult.Result;
     }
 
-    private async Task<CloudTable> GetCloudTableAsync(string tableName, CancellationToken ct = default)
+    public async Task<CloudTable> GetCloudTableAsync(string tableName, CancellationToken ct = default)
     {
         var table = _client.GetTableReference(tableName);
         _ = await table.CreateIfNotExistsAsync(ct);
