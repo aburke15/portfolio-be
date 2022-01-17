@@ -18,5 +18,4 @@ public interface ITableStorageService
     /// <param name="ct"></param>
     /// <returns></returns>
     Task<ITableEntity?> RetrieveAsync(string tableName, string id, string partitionKey, CancellationToken ct = default);
-    Task<IEnumerable<ITableEntity>> RetrieveAllAsync(string tableName, CancellationToken ct = default);
 }
