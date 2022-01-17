@@ -43,34 +43,7 @@ public class GitHubBackgroundService : BackgroundService
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
                 var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
 
-                if (result.IsSuccessful)
-                {
-                    var json = Guard.Against.NullOrWhiteSpace(result.Json, nameof(result.Json));
-                    var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(json);
-
-                    if (repos is null) continue;
-
-                    var entities = repos.Select(repo =>
-                        mapper.Map<GitHubRepositoryModel, GitHubRepositoryEntity>(repo, opt =>
-                        {
-                            opt.AfterMap((src, dest) =>
-                            {
-                                dest.GitHubId = src.Id;
-                                dest.PartitionKey = "repository";
-                            });
-                        })
-                    );
-
-                    var batchResult = await storageService.InsertManyAsync("repos", entities, stoppingToken);
-
-                    _logger.Log(
-                        LogLevel.Information,
-                        "{FullName} completed processing at: {DateTime}",
-                        fullName,
-                        DateTime.Now
-                    );
-                }
-                else
+                if (!result.IsSuccessful)
                 {
                     _logger.Log(
                         LogLevel.Warning,
@@ -79,7 +52,34 @@ public class GitHubBackgroundService : BackgroundService
                         fullName,
                         result.Message
                     );
+                    
+                    continue;
                 }
+
+                var json = Guard.Against.NullOrWhiteSpace(result.Json, nameof(result.Json));
+                var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(json);
+
+                if (repos is null) continue;
+
+                var entities = repos.Select(repo =>
+                    mapper.Map<GitHubRepositoryModel, GitHubRepositoryEntity>(repo, opt =>
+                    {
+                        opt.AfterMap((src, dest) =>
+                        {
+                            dest.GitHubId = src.Id;
+                            dest.PartitionKey = "repository";
+                        });
+                    })
+                );
+
+                _ = await storageService.InsertManyAsync("repos", entities, stoppingToken);
+
+                _logger.Log(
+                    LogLevel.Information,
+                    "{FullName} completed processing at: {DateTime}",
+                    fullName,
+                    DateTime.Now
+                );
             }
             catch (Exception ex)
             {

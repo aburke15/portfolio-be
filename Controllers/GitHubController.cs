@@ -28,10 +28,11 @@ public class GitHubController : ControllerBase
     [HttpGet("repos/{tableName}")]
     public async Task<IActionResult> GetReposAsync(string tableName, CancellationToken ct)
     {
-        var entities = await _storageService.RetrieveAllAsync(tableName, ct);
-        var results = _mapper.Map<IEnumerable<GitHubRepositoryModel>>(entities);
+        // var entities = await _storageService.RetrieveAllAsync(tableName, ct);
+        // var results = _mapper.Map<IEnumerable<GitHubRepositoryModel>>(entities);
         
-        return Ok(results);
+        // return Ok(results);
+        return Ok();
     }
 
     [HttpGet("repos/{id}/{partitionKey}")]
