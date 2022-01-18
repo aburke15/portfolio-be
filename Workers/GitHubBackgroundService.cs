@@ -73,7 +73,6 @@ public class GitHubBackgroundService : BackgroundService
                     {
                         opt.AfterMap((src, dest) =>
                         {
-                            dest.GitHubId = src.GitHubId;
                             dest.PartitionKey = "repository";
                         });
                     })

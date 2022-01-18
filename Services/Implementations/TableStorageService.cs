@@ -37,18 +37,4 @@ public class TableStorageService : ITableStorageService
 
         return await _client.ExecuteTableBatchOperationAsync(tableName, batchOperation, ct);
     }
-
-    public async Task<ITableEntity?> RetrieveAsync(string tableName, string id, string partitionKey, CancellationToken ct = default)
-    {
-        var retrieve = TableOperation.Retrieve<ITableEntity>(id, partitionKey);
-        return await _client.ExecuteTableOperationAsync(tableName, retrieve, ct);
-    }
-
-    public async Task<IEnumerable<ITableEntity>> RetrieveAllAsync(string tableName, CancellationToken ct = default)
-    {
-        var table = await _client.GetCloudTableAsync(tableName, ct);
-        var query = from entity in table.CreateQuery<TableEntity>() select entity;
-
-        return query.ToList();
-    }
 }

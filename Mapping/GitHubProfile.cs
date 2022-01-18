@@ -8,9 +8,9 @@ public class GitHubProfile : Profile
 {
     public GitHubProfile()
     {
-        CreateMap<ITableEntity, GitHubRepositoryModel>();
         CreateMap<GitHubRepositoryModel, ITableEntity>();
-        CreateMap<GitHubRepositoryEntity, GitHubRepositoryModel>();
         CreateMap<GitHubRepositoryModel, GitHubRepositoryEntity>();
+        CreateMap<GitHubRepositoryEntity, GitHubRepositoryViewModel>();
+        CreateMap<ITableEntity, GitHubRepositoryViewModel>();
     }
 }

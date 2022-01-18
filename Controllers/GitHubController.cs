@@ -28,17 +28,17 @@ public class GitHubController : ControllerBase
     {
         var entities = await _storageService.RetrieveAllAsync(ct);
         var results = entities.Select(entity =>
-            _mapper.Map<GitHubRepositoryModel>(entity)
+            _mapper.Map<GitHubRepositoryViewModel>(entity)
         );
 
         return Ok(results);
     }
 
-    [HttpGet("repos/{id}/{partitionKey}")]
-    public async Task<IActionResult> GetRepoByIdAsync([FromRoute] string id, [FromRoute] string partitionKey, CancellationToken ct)
+    [HttpGet("repos/{partitionKey}/{rowId}")]
+    public async Task<IActionResult> GetRepoByIdAsync([FromRoute] string partitionKey, [FromRoute] string rowId, CancellationToken ct)
     {
-        var entity = await _storageService.RetrieveAllAsync(ct);
-        var result = _mapper.Map<GitHubRepositoryModel>(entity);
+        var entity = await _storageService.RetrieveAsync(partitionKey, rowId, ct);
+        var result = _mapper.Map<GitHubRepositoryViewModel>(entity);
 
         return Ok(result);
     }
