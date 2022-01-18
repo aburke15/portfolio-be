@@ -1,3 +1,4 @@
+using System.Net;
 using ABU.GitHubApiClient.Abstractions;
 using ABU.GitHubApiClient.Models;
 using ABU.Portfolio.Models;
@@ -59,6 +60,12 @@ public class GitHubBackgroundService : BackgroundService
                 var json = Guard.Against.NullOrWhiteSpace(result.Json, nameof(result.Json));
                 var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(json);
 
+                if (result.IsSuccessful)
+                {
+                    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+                    continue;
+                }
+                
                 if (repos is null) continue;
 
                 var entities = repos.Select(repo =>
@@ -66,7 +73,7 @@ public class GitHubBackgroundService : BackgroundService
                     {
                         opt.AfterMap((src, dest) =>
                         {
-                            dest.GitHubId = src.Id;
+                            dest.GitHubId = src.GitHubId;
                             dest.PartitionKey = "repository";
                         });
                     })

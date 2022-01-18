@@ -10,15 +10,13 @@ public class TableStorageClient : ITableStorageClient
 {
     private const string AzureConnectionString = "DOTNET_AZURE_CONNECTION_STRING";
     private readonly CloudTableClient _client;
-    private readonly IMapper _mapper;
-    
-    public TableStorageClient(IMapper mapper)
+
+    public TableStorageClient()
     {
         var connectionString = Environment.GetEnvironmentVariable(AzureConnectionString);
         var storageAccount = CloudStorageAccount.Parse(Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString)));
         
         _client = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
-        _mapper = Guard.Against.Null(mapper, nameof(mapper));
     }
     
     public async Task<ITableEntity?> ExecuteTableOperationAsync(string tableName, TableOperation operation, CancellationToken ct = default)

@@ -12,35 +12,34 @@ namespace ABU.Portfolio.Controllers;
 [Route("api/[controller]")]
 public class GitHubController : ControllerBase
 {
-    private readonly IGitHubApiClient _client;
     private readonly ILogger<GitHubController> _logger;
-    private readonly ITableStorageService _storageService;
+    private readonly IGitHubTableStorageService _storageService;
     private readonly IMapper _mapper;
 
-    public GitHubController(IGitHubApiClient client, ILogger<GitHubController> logger, ITableStorageService storageService, IMapper mapper)
+    public GitHubController(ILogger<GitHubController> logger, IMapper mapper, IGitHubTableStorageService storageService)
     {
-        _client = client;
         _logger = logger;
-        _storageService = storageService;
         _mapper = mapper;
+        _storageService = storageService;
     }
 
-    [HttpGet("repos/{tableName}")]
-    public async Task<IActionResult> GetReposAsync(string tableName, CancellationToken ct)
+    [HttpGet("repos")]
+    public async Task<IActionResult> GetReposAsync(CancellationToken ct)
     {
-        // var entities = await _storageService.RetrieveAllAsync(tableName, ct);
-        // var results = _mapper.Map<IEnumerable<GitHubRepositoryModel>>(entities);
-        
-        // return Ok(results);
-        return Ok();
+        var entities = await _storageService.RetrieveAllAsync(ct);
+        var results = entities.Select(entity =>
+            _mapper.Map<GitHubRepositoryModel>(entity)
+        );
+
+        return Ok(results);
     }
 
     [HttpGet("repos/{id}/{partitionKey}")]
     public async Task<IActionResult> GetRepoByIdAsync([FromRoute] string id, [FromRoute] string partitionKey, CancellationToken ct)
     {
-        var entity = await _storageService.RetrieveAsync("repos", id, partitionKey, ct);
+        var entity = await _storageService.RetrieveAllAsync(ct);
         var result = _mapper.Map<GitHubRepositoryModel>(entity);
-        
+
         return Ok(result);
     }
 }
