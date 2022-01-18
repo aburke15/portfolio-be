@@ -26,9 +26,8 @@ public class TableStorageService : ITableStorageService
         return await _client.ExecuteTableOperationAsync(tableName, insertOrMerge, ct);
     }
 
-    public async Task<TableBatchResult> InsertManyAsync(string tableName, IEnumerable<ITableEntity> entities, CancellationToken ct = default)
+    public async Task<IEnumerable<ITableEntity?>> InsertManyAsync(string tableName, IEnumerable<ITableEntity> entities, CancellationToken ct = default)
     {
-        var table = await _client.GetCloudTableAsync(tableName, ct);
         TableBatchOperation batchOperation = new();
 
         foreach (var tableEntity in entities)
@@ -36,7 +35,7 @@ public class TableStorageService : ITableStorageService
             batchOperation.InsertOrMerge(tableEntity);
         }
 
-        return await table.ExecuteBatchAsync(batchOperation, ct);
+        return await _client.ExecuteTableBatchOperationAsync(tableName, batchOperation, ct);
     }
 
     public async Task<ITableEntity?> RetrieveAsync(string tableName, string id, string partitionKey, CancellationToken ct = default)

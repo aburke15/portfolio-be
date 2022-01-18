@@ -27,6 +27,7 @@ services.AddGitHubApiClient(options =>
 services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(GitHubProfile)); });
 services.AddScoped<ITableStorageClient, TableStorageClient>();
 services.AddTransient<ITableStorageService, TableStorageService>();
+services.AddTransient<IGitHubTableStorageService, GitHubTableStorageService>();
 
 services.AddHostedService<GitHubBackgroundService>();
 
