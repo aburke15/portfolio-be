@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Net;
 using ABU.GitHubApiClient.Abstractions;
 using ABU.GitHubApiClient.Models;
@@ -40,7 +41,7 @@ public class GitHubBackgroundService : BackgroundService
                 var scope = _provider.CreateScope();
                 
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
-                var storageService = scope.ServiceProvider.GetRequiredService<ITableStorageService>();
+                var storageService = scope.ServiceProvider.GetRequiredService<IGitHubTableStorageService>();
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
                 var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
 
@@ -53,22 +54,15 @@ public class GitHubBackgroundService : BackgroundService
                         fullName,
                         result.Message
                     );
-                    
                     continue;
                 }
 
                 var json = Guard.Against.NullOrWhiteSpace(result.Json, nameof(result.Json));
                 var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(json);
-
-                if (result.IsSuccessful)
-                {
-                    await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
-                    continue;
-                }
                 
                 if (repos is null) continue;
 
-                var entities = repos.Select(repo =>
+                var jsonEntities = repos.Select(repo =>
                     mapper.Map<GitHubRepositoryModel, GitHubRepositoryEntity>(repo, opt =>
                     {
                         opt.AfterMap((src, dest) =>
@@ -76,9 +70,19 @@ public class GitHubBackgroundService : BackgroundService
                             dest.PartitionKey = "repository";
                         });
                     })
-                );
+                ).ToList();
 
-                _ = await storageService.InsertManyAsync("repos", entities, stoppingToken);
+                // TODO: update this to use caching instead.
+                var repoNames = (await storageService.RetrieveAllAsync(stoppingToken))
+                    .Select(r => r.Name)
+                    .ToImmutableList();
+
+                var entitiesToAdd = jsonEntities
+                    .Where(entity => !repoNames.Contains(entity.Name))
+                    .ToImmutableList();
+
+                if (entitiesToAdd.Any())
+                    _ = await storageService.InsertManyAsync("repos", entitiesToAdd, stoppingToken);
 
                 _logger.Log(
                     LogLevel.Information,
@@ -99,7 +103,7 @@ public class GitHubBackgroundService : BackgroundService
                 );
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+            await Task.Delay(TimeSpan.FromDays(5), stoppingToken);
         }
 
         _logger.Log(
