@@ -2,6 +2,7 @@ using ABU.Portfolio.Models;
 using ABU.Portfolio.Services.Abstractions;
 using Ardalis.GuardClauses;
 using JetBrains.Annotations;
+using Microsoft.Azure.Cosmos.Table;
 
 namespace ABU.Portfolio.Services.Implementations;
 
@@ -24,5 +25,11 @@ public class GitHubTableStorageService : TableStorageService, IGitHubTableStorag
             select entity;
 
         return query.ToList();
+    }
+
+    public async Task<GitHubRepositoryEntity?> RetrieveAsync(string partitionKey, string rowId, CancellationToken ct = default)
+    {
+        var retrieve = TableOperation.Retrieve<GitHubRepositoryEntity>(partitionKey, rowId);
+        return await _client.ExecuteTableOperationAsync(TableName, retrieve, ct) as GitHubRepositoryEntity;
     }
 }

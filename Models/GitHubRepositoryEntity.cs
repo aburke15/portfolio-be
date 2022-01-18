@@ -6,12 +6,11 @@ public class GitHubRepositoryEntity : TableEntity
 {
     public GitHubRepositoryEntity()
     {
-        var id = Guid.NewGuid().ToString();
-        Id = id;
-        RowKey = id;
+        RowId = RowKey = Guid.NewGuid()
+            .ToString();
     }
-    
-    public string Id { get; }
+
+    public string RowId { get; set; }
     public long GitHubId { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
