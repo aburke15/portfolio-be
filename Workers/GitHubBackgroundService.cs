@@ -6,7 +6,6 @@ using ABU.Portfolio.Models;
 using ABU.Portfolio.Services.Abstractions;
 using Ardalis.GuardClauses;
 using AutoMapper;
-using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 
 namespace ABU.Portfolio.Workers;
@@ -32,7 +31,7 @@ public class GitHubBackgroundService : BackgroundService
             try
             {
                 _logger.Log(
-                    LogLevel.Information, message:
+                    LogLevel.Information,
                     "{FullName} started at: {DateTime}",
                     fullName,
                     DateTime.Now
