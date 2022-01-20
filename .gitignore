@@ -505,7 +505,6 @@ Temporary Items
 .apdisk
 
 # User added
-nuget.*
 .idea/
 
 # Default ignored files
