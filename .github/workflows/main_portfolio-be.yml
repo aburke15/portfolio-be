@@ -23,7 +23,10 @@ jobs:
           include-prerelease: true
         
       - name: Add github.com as nuget package source
-        run: dotnet nuget add source https://nuget.pkg.github.com/aburke15/index.json --name github.com
+        run: dotnet nuget add source https://nuget.pkg.github.com/aburke15/index.json --name github.pkg
+
+      - name: Add nuget.org as nuget package source
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json --name nuget.pgk
 
       - name: Build with dotnet
         env:
