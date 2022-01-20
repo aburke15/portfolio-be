@@ -23,7 +23,7 @@ jobs:
           include-prerelease: true
           
       - name: Restore packages
-        run: dotnet restore --packages
+        run: dotnet restore --configfile nuget.config
 
       - name: Build with dotnet
         env:
