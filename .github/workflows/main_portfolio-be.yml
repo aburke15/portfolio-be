@@ -21,9 +21,6 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: true
-          
-      - name: Restore packages
-        run: dotnet restore --configfile nuget.config
 
       - name: Build with dotnet
         env:
@@ -32,7 +29,7 @@ jobs:
           DOTNET_AZURE_CONNECTION_STRING: ${{ secrets.DOTNET_AZURE_CONNECTION_STRING }}
           GITHUBPAT: ${{ secrets.GITHUBPAT }}
         
-        run: dotnet build --configuration Release
+        run: dotnet restore --configfile nuget.config && dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
