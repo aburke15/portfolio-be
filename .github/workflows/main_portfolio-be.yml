@@ -22,6 +22,9 @@ jobs:
           dotnet-version: '6.0.x'
           include-prerelease: true
 
+      - name: Add nuget.org as nuget package source
+        run: dotnet nuget add source https://api.nuget.org/v3/index.json --name nuget.org
+
       - name: Build with dotnet
         env:
           DOTNET_GITHUB_TOKEN: ${{ secrets.DOTNET_GITHUB_TOKEN }}
@@ -29,7 +32,7 @@ jobs:
           DOTNET_AZURE_CONNECTION_STRING: ${{ secrets.DOTNET_AZURE_CONNECTION_STRING }}
           GITHUBPAT: ${{ secrets.GITHUBPAT }}
         
-        run: dotnet restore --configfile nuget.config && dotnet build --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
