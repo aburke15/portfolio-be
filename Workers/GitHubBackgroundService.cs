@@ -58,12 +58,12 @@ public class GitHubBackgroundService : BackgroundService
                 }
 
                 var json = Guard.Against.NullOrWhiteSpace(result.Json, nameof(result.Json));
-                var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryModel>>(json);
+                var repos = JsonConvert.DeserializeObject<IEnumerable<GitHubRepositoryApiResponse>>(json);
                 
                 if (repos is null) continue;
 
                 var jsonEntities = repos.Select(repo =>
-                    mapper.Map<GitHubRepositoryModel, GitHubRepositoryEntity>(repo, opt =>
+                    mapper.Map<GitHubRepositoryApiResponse, GitHubRepositoryEntity>(repo, opt =>
                     {
                         opt.AfterMap((src, dest) =>
                         {
