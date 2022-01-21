@@ -11,9 +11,10 @@ public class TableStorageClient : ITableStorageClient
     private const string AzureConnectionString = "DOTNET_AZURE_CONNECTION_STRING";
     private readonly CloudTableClient _client;
 
-    public TableStorageClient()
+    public TableStorageClient(IConfiguration config)
     {
-        var connectionString = Environment.GetEnvironmentVariable(AzureConnectionString);
+        var configuration = Guard.Against.Null(config, nameof(config));
+        var connectionString = configuration.GetValue<string>("AzureStorage:ConnectionString");
         var storageAccount = CloudStorageAccount.Parse(Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString)));
         
         _client = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
