@@ -27,9 +27,9 @@ public class GitHubController : ControllerBase
     public async Task<IActionResult> GetReposAsync(CancellationToken ct)
     {
         var entities = await _storageService.RetrieveAllAsync(ct);
-        var results = entities.Select(entity =>
-            _mapper.Map<GitHubRepositoryResponse>(entity)
-        );
+        var results = entities
+            .OrderByDescending(e => e.CreatedAt)
+            .Select(entity => _mapper.Map<GitHubRepositoryResponse>(entity));
 
         return Ok(results);
     }
