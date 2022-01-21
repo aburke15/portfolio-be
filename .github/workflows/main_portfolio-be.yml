@@ -21,6 +21,7 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: false
+          app-settings-json: ${{ secrets.APP_SETTINGS }}
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -53,6 +54,5 @@ jobs:
         with:
           app-name: 'portfolio-be'
           slot-name: 'Production'
-          app-settings-json: ${{ secrets.APP_SETTINGS }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D83FF992AA874C849A4442C8505E3966 }}
           package: .
