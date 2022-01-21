@@ -6,12 +6,26 @@ using ABU.Portfolio.Services.Implementations;
 using ABU.Portfolio.Workers;
 using Ardalis.GuardClauses;
 
+const string portfolioOrigins = "ReactPortfolioOrigin";
+
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 DotEnv.LoadEnvironmentVariables();
 builder.Configuration.AddEnvironmentVariables();
 // Add services to the container.
+services.AddCors(options =>
+{
+    options.AddPolicy(name: portfolioOrigins,
+        corsPolicyBuilder =>
+        {
+            corsPolicyBuilder.WithOrigins(
+                "https://www.aburke.tech",
+                "https://aburke.tech",
+                "http://localhost:3000"
+            );
+        });
+});
 
 services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -36,6 +50,7 @@ services.AddHostedService<GitHubBackgroundService>();
 
 var app = builder.Build();
 
+app.UseCors(portfolioOrigins);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
