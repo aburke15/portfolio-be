@@ -21,15 +21,6 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: false
-      
-      - name: Remove nuget source nuget.org
-        run: dotnet nuget remove source nuget.org
-      
-      - name: Remove nuget source github
-        run: dotnet nuget remove source github
-        
-      - name: Add nuget sources
-        run: dotnet nuget add source --configfile \.
 
       - name: Build with dotnet
         env:
