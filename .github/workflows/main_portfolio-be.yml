@@ -20,23 +20,22 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
-          include-prerelease: true
+          include-prerelease: false
       
-      - name: Remove nuget source
+      - name: Remove nuget source nuget.org
         run: dotnet nuget remove source nuget.org
+      
+      - name: Remove nuget source github
+        run: dotnet nuget remove source github
         
-      - name: Add github.com as nuget package source
-        run: dotnet nuget add source https://nuget.pkg.github.com/aburke15/index.json --name github.pkg
-
-      - name: Add nuget.org as nuget package source
-        run: dotnet nuget add source https://api.nuget.org/v3/index.json --name nuget.pkg
+      - name: Restore all packages
+        run: dotnet restore --configfile nuget.config
 
       - name: Build with dotnet
         env:
           DOTNET_GITHUB_TOKEN: ${{ secrets.DOTNET_GITHUB_TOKEN }}
           DOTNET_GITHUB_USER: ${{ secrets.DOTNET_GITHUB_USER }}
           DOTNET_AZURE_CONNECTION_STRING: ${{ secrets.DOTNET_AZURE_CONNECTION_STRING }}
-          GITHUBPAT: ${{ secrets.GITHUBPAT }}
         
         run: dotnet build --configuration Release
 
