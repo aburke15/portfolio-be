@@ -9,7 +9,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace ABU.Portfolio.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/repos")]
 public class GitHubController : ControllerBase
 {
     private readonly ILogger<GitHubController> _logger;
@@ -23,7 +23,7 @@ public class GitHubController : ControllerBase
         _storageService = storageService;
     }
 
-    [HttpGet("repos")]
+    [HttpGet]
     public async Task<IActionResult> GetReposAsync(CancellationToken ct)
     {
         var entities = await _storageService.RetrieveAllAsync(ct);
@@ -34,7 +34,7 @@ public class GitHubController : ControllerBase
         return Ok(results);
     }
 
-    [HttpGet("repos/{partitionKey}/{rowId}")]
+    [HttpGet("{partitionKey}/{rowId}")]
     public async Task<IActionResult> GetRepoByIdAsync([FromRoute] string partitionKey, [FromRoute] string rowId, CancellationToken ct)
     {
         var entity = await _storageService.RetrieveAsync(partitionKey, rowId, ct);
