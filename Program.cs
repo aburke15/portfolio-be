@@ -4,6 +4,7 @@ using ABU.Portfolio.Mapping;
 using ABU.Portfolio.Services.Abstractions;
 using ABU.Portfolio.Services.Implementations;
 using ABU.Portfolio.Workers;
+using Ardalis.GuardClauses;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -17,11 +18,13 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
+var user = builder.Configuration.GetValue<string>("GitHub:User");
+var token = builder.Configuration.GetValue<string>("GitHub:PAT");
+
 // User add
-services.AddGitHubApiClient(options =>
-{
-    options.AddToken(Environment.GetEnvironmentVariable("DOTNET_GITHUB_TOKEN")!);
-    options.AddUsername(Environment.GetEnvironmentVariable("DOTNET_GITHUB_USER")!);
+services.AddGitHubApiClient(options => {
+    options.AddUsername(Guard.Against.NullOrWhiteSpace(user, nameof(user)));
+    options.AddToken(Guard.Against.NullOrWhiteSpace(token, nameof(token)));
 });
 
 services.AddAutoMapper(cfg => { cfg.AddMaps(typeof(GitHubProfile)); });
