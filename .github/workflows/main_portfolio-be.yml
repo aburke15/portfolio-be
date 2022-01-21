@@ -28,11 +28,8 @@ jobs:
       - name: Remove nuget source github
         run: dotnet nuget remove source github
         
-      - name: Add nuget source nuget config
-        run: dotnet nuget add source --configfile nuget.config
-        
-      - name: Restore all packages
-        run: dotnet restore --configfile nuget.config
+      - name: Add nuget sources
+        run: dotnet nuget add source --configfile \.
 
       - name: Build with dotnet
         env:
