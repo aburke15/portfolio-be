@@ -26,10 +26,6 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        env:
-          DOTNET_GITHUB_TOKEN: ${{ secrets.DOTNET_GITHUB_TOKEN }}
-          DOTNET_GITHUB_USER: ${{ secrets.DOTNET_GITHUB_USER }}
-          DOTNET_AZURE_CONNECTION_STRING: ${{ secrets.DOTNET_AZURE_CONNECTION_STRING }}
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
@@ -57,5 +53,8 @@ jobs:
         with:
           app-name: 'portfolio-be'
           slot-name: 'Production'
+          DOTNET_GITHUB_TOKEN: ${{ secrets.DOTNET_GITHUB_TOKEN }}
+          DOTNET_GITHUB_USER: ${{ secrets.DOTNET_GITHUB_USER }}
+          DOTNET_AZURE_CONNECTION_STRING: ${{ secrets.DOTNET_AZURE_CONNECTION_STRING }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D83FF992AA874C849A4442C8505E3966 }}
           package: .
