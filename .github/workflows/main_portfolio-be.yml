@@ -21,7 +21,6 @@ jobs:
         with:
           dotnet-version: '6.0.x'
           include-prerelease: false
-          app-settings-json: ${{ secrets.APP_SETTINGS }}
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
