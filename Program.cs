@@ -11,7 +11,6 @@ const string portfolioOrigins = "ReactPortfolioOrigin";
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
-DotEnv.LoadEnvironmentVariables();
 builder.Configuration.AddEnvironmentVariables();
 // Add services to the container.
 services.AddCors(options =>
