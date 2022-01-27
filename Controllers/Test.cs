@@ -14,7 +14,7 @@ public class Test : Controller
     [HttpGet]
     public IActionResult GetAppSettingsValue()
     {
-        var gitHubUser = _config.GetValue<string>("GitHub:User");
+        var gitHubUser = _config.GetValue<string>("GITHUB_USER");
         return Ok(gitHubUser);
     }
 }
