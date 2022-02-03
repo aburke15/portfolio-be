@@ -21,7 +21,8 @@ services.AddCors(options =>
             corsPolicyBuilder.WithOrigins(
                 "https://www.aburke.tech",
                 "https://aburke.tech",
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "https://aburke.vercel.app"
             );
         });
 });
@@ -31,11 +32,15 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-var user = builder.Configuration.GetValue<string>("GITHUB_USER");
-var token = builder.Configuration.GetValue<string>("GITHUB_PAT");
+// var user = builder.Configuration.GetValue<string>("GITHUB_USER");
+// var token = builder.Configuration.GetValue<string>("GITHUB_PAT");
+
+var user = Environment.GetEnvironmentVariable("GITHUB_USER");
+var token = Environment.GetEnvironmentVariable("GITHUB_PAT");
 
 // User add
-services.AddGitHubApiClient(options => {
+services.AddGitHubApiClient(options =>
+{
     options.AddUsername(Guard.Against.NullOrWhiteSpace(user, nameof(user)));
     options.AddToken(Guard.Against.NullOrWhiteSpace(token, nameof(token)));
 });
