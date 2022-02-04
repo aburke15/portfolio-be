@@ -14,7 +14,6 @@ public class TableStorageClient : ITableStorageClient
     public TableStorageClient(IConfiguration config)
     {
         var configuration = Guard.Against.Null(config, nameof(config));
-        // var connectionString = configuration.GetValue<string>("AZURE_STORAGE_CS");
         var connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CS");
         var storageAccount = CloudStorageAccount.Parse(Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString)));
 

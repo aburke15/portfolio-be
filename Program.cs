@@ -32,9 +32,6 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-// var user = builder.Configuration.GetValue<string>("GITHUB_USER");
-// var token = builder.Configuration.GetValue<string>("GITHUB_PAT");
-
 var user = Environment.GetEnvironmentVariable("GITHUB_USER");
 var token = Environment.GetEnvironmentVariable("GITHUB_PAT");
 
