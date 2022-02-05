@@ -15,6 +15,9 @@ public class Test : Controller
     public IActionResult GetAppSettingsValue()
     {
         var gitHubUser = _config.GetValue<string>("GITHUB_USER");
-        return Ok(gitHubUser);
+        return Ok(new
+        {
+            Username = gitHubUser
+        });
     }
 }
