@@ -32,8 +32,11 @@ services.AddControllers();
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
-var user = Environment.GetEnvironmentVariable("GITHUB_USER");
-var token = Environment.GetEnvironmentVariable("GITHUB_PAT");
+const string gitHubUser = "GITHUB_USER";
+const string gitHubPat = "GITHUB_PAT";
+
+var user = Environment.GetEnvironmentVariable(gitHubUser);
+var token = Environment.GetEnvironmentVariable(gitHubPat);
 
 // User add
 services.AddGitHubApiClient(options =>
