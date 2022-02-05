@@ -14,12 +14,16 @@ public class TableStorageClient : ITableStorageClient
     public TableStorageClient()
     {
         var connectionString = Environment.GetEnvironmentVariable(AzureConnectionString);
-        var storageAccount = CloudStorageAccount.Parse(Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString)));
+        var storageAccount = CloudStorageAccount.Parse(
+            Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString)));
 
         _client = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
     }
 
-    public async Task<ITableEntity?> ExecuteTableOperationAsync(string tableName, TableOperation operation, CancellationToken ct = default)
+    public async Task<ITableEntity?> ExecuteTableOperationAsync(
+        string tableName, 
+        TableOperation operation, 
+        CancellationToken ct = default)
     {
         var table = await GetCloudTableAsync(tableName, ct);
         var tableResult = await table.ExecuteAsync(operation, ct);
@@ -38,7 +42,9 @@ public class TableStorageClient : ITableStorageClient
             .ToList();
     }
 
-    public async Task<CloudTable> GetCloudTableAsync(string tableName, CancellationToken ct = default)
+    public async Task<CloudTable> GetCloudTableAsync(
+        string tableName, 
+        CancellationToken ct = default)
     {
         var table = _client.GetTableReference(tableName);
         _ = await table.CreateIfNotExistsAsync(ct);
