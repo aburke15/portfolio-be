@@ -12,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
 builder.Configuration.AddEnvironmentVariables();
+
+if (builder.Environment.IsDevelopment())
+    DotEnv.LoadEnvironmentVariables();
+
 // Add services to the container.
 services.AddCors(options =>
 {
@@ -21,8 +25,8 @@ services.AddCors(options =>
             corsPolicyBuilder.WithOrigins(
                 "https://www.aburke.tech",
                 "https://aburke.tech",
-                "http://localhost:3000",
-                "https://aburke.vercel.app"
+                "https://aburke.vercel.app",
+                "http://localhost:3000"
             );
         });
 });
