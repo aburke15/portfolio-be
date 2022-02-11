@@ -521,3 +521,5 @@ Temporary Items
 /dataSources/
 /dataSources.local.xml
 data.json
+
+.env

@@ -42,7 +42,15 @@ public class GitHubBackgroundService : BackgroundService
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var storageService = scope.ServiceProvider.GetRequiredService<IGitHubTableStorageService>();
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
-                var result = await client.GetRepositoriesForAuthUserAsync(new GitHubRepoRouteParams { PerPage = "100" }, stoppingToken);
+
+                var routeParams = new RepositoryRouteParams
+                {
+                    PerPage = "100", 
+                    Visibility = "public", 
+                    Affiliation = "owner"
+                };
+                
+                var result = await client.GetRepositoriesForAuthUserAsync(routeParams, stoppingToken);
 
                 if (!result.IsSuccessful)
                 {
@@ -102,7 +110,7 @@ public class GitHubBackgroundService : BackgroundService
                 );
             }
 
-            await Task.Delay(TimeSpan.FromDays(5), stoppingToken);
+            await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
         }
 
         _logger.Log(
