@@ -38,16 +38,13 @@ public class GitHubBackgroundService : BackgroundService
                 );
 
                 var scope = _provider.CreateScope();
-                
                 var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
                 var storageService = scope.ServiceProvider.GetRequiredService<IGitHubTableStorageService>();
                 var client = scope.ServiceProvider.GetRequiredService<IGitHubApiClient>();
 
                 var routeParams = new RepositoryRouteParams
                 {
-                    PerPage = "100", 
-                    Visibility = "public", 
-                    Affiliation = "owner"
+                    PerPage = "100", Visibility = "public", Affiliation = "owner"
                 };
                 
                 var result = await client.GetRepositoriesForAuthUserAsync(routeParams, stoppingToken);
